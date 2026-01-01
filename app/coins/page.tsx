@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { cn, formatPercentage, formatCurrency } from '@/lib/utils';
 import DataTable from '@/components/DataTable';
 import CoinsPagination from '@/components/CoinsPagination';
+import ApiErrorFallback from '@/components/ApiErrorFallback';
 
 const Coins = async ({ searchParams }: NextPageProps) => {
   const { page } = await searchParams;
@@ -12,14 +13,20 @@ const Coins = async ({ searchParams }: NextPageProps) => {
   const currentPage = Number(page) || 1;
   const perPage = 10;
 
-  const coinsData = await fetcher<CoinMarketData[]>('/coins/markets', {
-    vs_currency: 'usd',
-    order: 'market_cap_desc',
-    per_page: perPage,
-    page: currentPage,
-    sparkline: 'false',
-    price_change_percentage: '24h',
-  });
+  let coinsData: CoinMarketData[] = [];
+  try {
+    coinsData = await fetcher<CoinMarketData[]>('/coins/markets', {
+      vs_currency: 'usd',
+      order: 'market_cap_desc',
+      per_page: perPage,
+      page: currentPage,
+      sparkline: 'false',
+      price_change_percentage: '24h',
+    });
+  } catch (error) {
+    console.error('Error fetching coins list:', error);
+    return <ApiErrorFallback title="Unable to load coins" error={error} />;
+  }
 
   const columns: DataTableColumn<CoinMarketData>[] = [
     {

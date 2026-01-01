@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { cn, formatCurrency, formatPercentage } from '@/lib/utils';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import DataTable from '@/components/DataTable';
-import { TrendingCoinsFallback } from './fallback';
+import ApiErrorFallback from '@/components/ApiErrorFallback';
 
 const TrendingCoins = async () => {
   let trendingCoins;
@@ -13,7 +13,7 @@ const TrendingCoins = async () => {
     trendingCoins = await fetcher<{ coins: TrendingCoin[] }>('/search/trending', undefined, 300);
   } catch (error) {
     console.error('Error fetching trending coins:', error);
-    return <TrendingCoinsFallback />;
+    return <ApiErrorFallback title="Unable to load trending" error={error} />;
   }
 
   const columns: DataTableColumn<TrendingCoin>[] = [

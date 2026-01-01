@@ -1,8 +1,8 @@
 import { fetcher } from '@/lib/coingecko.actions';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
-import { CoinOverviewFallback } from './fallback';
 import CandlestickChart from '@/components/CandlestickChart';
+import ApiErrorFallback from '@/components/ApiErrorFallback';
 
 const CoinOverview = async () => {
   try {
@@ -34,7 +34,7 @@ const CoinOverview = async () => {
     );
   } catch (error) {
     console.error('Error fetching coin overview:', error);
-    return <CoinOverviewFallback />;
+    return <ApiErrorFallback title="Unable to load overview" error={error} />;
   }
 };
 

@@ -4,20 +4,28 @@ import { ArrowUpRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import LiveDataWrapper from '@/components/LiveDataWrapper';
 import Converter from '@/components/Converter';
+import ApiErrorFallback from '@/components/ApiErrorFallback';
 
 const Page = async ({ params }: NextPageProps) => {
   const { id } = await params;
 
-  const [coinData, coinOHLCData] = await Promise.all([
-    fetcher<CoinDetailsData>(`/coins/${id}`, {
-      dex_pair_format: 'contract_address',
-    }),
-    fetcher<OHLCData>(`/coins/${id}/ohlc`, {
-      vs_currency: 'usd',
-      days: 1,
-      precision: 'full',
-    }),
-  ]);
+  let coinData: CoinDetailsData;
+  let coinOHLCData: OHLCData[];
+  try {
+    [coinData, coinOHLCData] = await Promise.all([
+      fetcher<CoinDetailsData>(`/coins/${id}`, {
+        dex_pair_format: 'contract_address',
+      }),
+      fetcher<OHLCData[]>(`/coins/${id}/ohlc`, {
+        vs_currency: 'usd',
+        days: 1,
+        precision: 'full',
+      }),
+    ]);
+  } catch (error) {
+    console.error('Error fetching coin details:', error);
+    return <ApiErrorFallback title="Unable to load coin details" error={error} />;
+  }
 
   const platform = coinData.asset_platform_id
     ? coinData.detail_platforms?.[coinData.asset_platform_id]

@@ -3,7 +3,7 @@ import DataTable from '@/components/DataTable';
 import Image from 'next/image';
 import { cn, formatCurrency, formatPercentage } from '@/lib/utils';
 import { TrendingDown, TrendingUp } from 'lucide-react';
-import { CategoriesFallback } from './fallback';
+import ApiErrorFallback from '@/components/ApiErrorFallback';
 
 const Categories = async () => {
   try {
@@ -65,7 +65,7 @@ const Categories = async () => {
     );
   } catch (error) {
     console.error('Error fetching categories:', error);
-    return <CategoriesFallback />;
+    return <ApiErrorFallback title="Unable to load categories" error={error} />;
   }
 };
 
